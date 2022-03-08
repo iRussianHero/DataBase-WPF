@@ -63,5 +63,6 @@
             <Button Command="{Binding UpdateButton, UpdateSourceTrigger=PropertyChanged}" Width="120" >Изменить позицию</Button>
             <Button Command="{Binding DeleteButton,UpdateSourceTrigger=PropertyChanged}" Width="110" >Удалить</Button>
         </StackPanel>
+        <DataGrid ItemsSource="{Binding Products,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="1"/>
     </Grid>
 </Window>
