@@ -1,0 +1,27 @@
+﻿<Window x:Class="WpfApp40.AddPosition"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp40"
+        mc:Ignorable="d"
+        Title="AddPosition" Height="297.309" Width="185">
+    <Window.DataContext>
+        <local:AddPositionViewModel></local:AddPositionViewModel>
+    </Window.DataContext>
+    <StackPanel>
+        <Label Margin="5">Наименование</Label>
+        <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="5"></TextBox>
+        <Label Margin="5">Цена</Label>
+        <TextBox Text="{Binding Price, UpdateSourceTrigger=PropertyChanged}" Margin="5"></TextBox>
+        <Label Margin="5">Категория</Label>
+        
+        <ComboBox  Text="{Binding Category, UpdateSourceTrigger=PropertyChanged}"
+                   ItemsSource="{Binding Categories,UpdateSourceTrigger=PropertyChanged}"
+                   Margin="5" IsEditable="True"/>
+
+
+        <Button Command="{Binding AddButton, UpdateSourceTrigger=PropertyChanged}" Margin="5">Добавить</Button>
+        <Button Command="{Binding CloseButton, UpdateSourceTrigger=PropertyChanged}" Margin="5">Отменить</Button>
+    </StackPanel>
+</Window>
