@@ -177,6 +177,15 @@ namespace WpfApp40
                 PropertyChanging("Products");
             }
         }
+        public List<Product> ClientProducts
+        {
+            get { return clientProducts; }
+            set
+            {
+                products = new List<Product>(clientProducts);
+                PropertyChanging("ClientProducts");
+            }
+        }
 
     }
 }
