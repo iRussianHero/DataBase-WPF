@@ -37,6 +37,32 @@ namespace WpfApp40
                 PropertyChanging("SelectedItem");
             }
         }
+        public ViewModel()
+        {
+            myShop = new ShopContext();
+            products = new List<Product>();
+            clientProducts = new List<Product>();
+            RefreshData();
+        }
+        public List<Product> Products
+        {
+            get { return products; }
+            set
+            {
+                products = new List<Product>(products);
+                PropertyChanging("Products");
+            }
+        }
+        public List<Product> ClientProducts
+        {
+            get { return clientProducts; }
+            set
+            {
+                products = new List<Product>(clientProducts);
+                PropertyChanging("ClientProducts");
+            }
+        }
+
         public bool Rb1
         {
             get { return rb1; }
@@ -82,7 +108,7 @@ namespace WpfApp40
             get { return new ButtonsCommand(
                 () =>
                 {
-               addPosition = new AddPosition();
+                    addPosition = new AddPosition();
                     addPosition.ShowDialog();
                     RefreshData();
                     //ShopContext shopContext = new ShopContext();
@@ -136,13 +162,6 @@ namespace WpfApp40
                     }
                 }); }
         }
-        public ViewModel()
-        {
-            myShop = new ShopContext();
-            products = new List<Product>();
-            clientProducts = new List<Product>();
-            RefreshData();
-        }
         void RefreshData( string text="")
         {
             myShop = new ShopContext();
@@ -168,24 +187,5 @@ namespace WpfApp40
             }
             Products = products;
         }
-        public List<Product> Products
-        {
-            get { return products; }
-            set
-            {
-                products = new List<Product>(products);
-                PropertyChanging("Products");
-            }
-        }
-        public List<Product> ClientProducts
-        {
-            get { return clientProducts; }
-            set
-            {
-                products = new List<Product>(clientProducts);
-                PropertyChanging("ClientProducts");
-            }
-        }
-
     }
 }

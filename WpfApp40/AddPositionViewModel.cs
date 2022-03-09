@@ -17,6 +17,7 @@ namespace WpfApp40
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+
         string name;
         int price;
         string category;
@@ -43,7 +44,7 @@ namespace WpfApp40
                     Categories.Add(cat.Category);
             }
          
-            Categories= categories;
+            Categories = categories;
         }
 
         public ICommand CloseButton
@@ -83,6 +84,7 @@ namespace WpfApp40
               });
             }
         }
+
         public string Name
         {
             get { return name; }
@@ -120,6 +122,5 @@ namespace WpfApp40
                 PropertyChanging("Categories");
             }
         }
-
     }
 }
