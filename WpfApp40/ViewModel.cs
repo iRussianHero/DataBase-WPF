@@ -17,7 +17,7 @@ namespace WpfApp40
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        ShopContext myShop ;
+        ShopContext myShop;
         bool rb1;
         bool rb2;
         bool rb3;
@@ -28,15 +28,6 @@ namespace WpfApp40
         public static Product selectedItem;
         string findText;
 
-        public Product SelectedItem
-        {
-            get { return selectedItem; }
-            set
-            {
-                selectedItem = value;
-                PropertyChanging("SelectedItem");
-            }
-        }
         public ViewModel()
         {
             myShop = new ShopContext();
@@ -58,19 +49,29 @@ namespace WpfApp40
             get { return clientProducts; }
             set
             {
-                products = new List<Product>(clientProducts);
+                clientProducts = value;
                 PropertyChanging("ClientProducts");
+            }
+        }
+        public Product SelectedItem
+        {
+            get { return selectedItem; }
+            set
+            {
+                selectedItem = value;
+                PropertyChanging("SelectedItem");
             }
         }
 
         public bool Rb1
         {
             get { return rb1; }
-            set { 
+            set
+            {
                 rb1 = value;
                 PropertyChanging("Rb1");
                 RefreshData(findText);
-               
+
             }
         }
         public bool Rb2
@@ -103,21 +104,25 @@ namespace WpfApp40
                 PropertyChanging("FindText");
             }
         }
+
         public ICommand AddButton
         {
-            get { return new ButtonsCommand(
-                () =>
-                {
-                    addPosition = new AddPosition();
-                    addPosition.ShowDialog();
-                    RefreshData();
+            get
+            {
+                return new ButtonsCommand(
+              () =>
+              {
+                  addPosition = new AddPosition();
+                  addPosition.ShowDialog();
+                  RefreshData();
                     //ShopContext shopContext = new ShopContext();
                     //shopContext.Products.Add(new Product() 
                     //{ Name = "Свекла", Price = 50, Category = "Овощь" });
                     //shopContext.SaveChanges();
                     //MessageBox.Show("Выполнено");
                 }
-                ); }
+              );
+            }
         }
         public ICommand UpdateButton
         {
@@ -132,43 +137,122 @@ namespace WpfApp40
                       updatePosition.ShowDialog();
                       RefreshData();
                   }
-                    //ShopContext shopContext = new ShopContext();
-                    //shopContext.Products.Add(new Product() 
-                    //{ Name = "Свекла", Price = 50, Category = "Овощь" });
-                    //shopContext.SaveChanges();
-                    //MessageBox.Show("Выполнено");
-                }
+                  //ShopContext shopContext = new ShopContext();
+                  //shopContext.Products.Add(new Product() 
+                  //{ Name = "Свекла", Price = 50, Category = "Овощь" });
+                  //shopContext.SaveChanges();
+                  //MessageBox.Show("Выполнено");
+              }
               );
             }
         }
         public ICommand DeleteButton
         {
-            get { return new ButtonsCommand(
-                ()=>
-                {
-                    if (selectedItem != null)
-                    {
-                        MessageBoxResult result =
-                         MessageBox.Show("Действительно удалить продукт "
-                             + selectedItem.Name + "?", "Удалить?", MessageBoxButton.YesNo,
-                             MessageBoxImage.Question);
+            get
+            {
+                return new ButtonsCommand(
+              () =>
+              {
+                  if (selectedItem != null)
+                  {
+                      MessageBoxResult result =
+                       MessageBox.Show("Действительно удалить продукт "
+                           + selectedItem.Name + "?", "Удалить?", MessageBoxButton.YesNo,
+                           MessageBoxImage.Question);
 
-                        if (result == MessageBoxResult.Yes)
+                      if (result == MessageBoxResult.Yes)
+                      {
+                          myShop.Products.Remove(selectedItem);
+                          myShop.SaveChanges();
+                          RefreshData();
+                      }
+                  }
+              });
+            }
+        }
+        public ICommand BuyProduct
+        {
+            get
+            {
+                return new ButtonsCommand(
+              () =>
+              {
+                  if (selectedItem != null)
+                  {
+                      clientProducts.Add(selectedItem);
+                      List<Product> clone = new List<Product>(clientProducts.Count);
+                      clientProducts.ForEach((index) => { clone.Add(index); });
+                      ClientProducts = clone;
+                  }
+              }
+              );
+            }
+        }
+        public ICommand Order
+        {
+            get
+            {
+                return new ButtonsCommand(
+                    () =>
+                    {
+                        if(clientProducts.Count==0) return;
+                        SortedDictionary<int, double> dictionary = new SortedDictionary<int, double>();
+
+                        for (int i = 0; i < ClientProducts.Count(); ++i)
                         {
-                            myShop.Products.Remove(selectedItem);
-                            myShop.SaveChanges();
-                            RefreshData();
+                            if (!dictionary.ContainsKey(ClientProducts[i].Id))
+                            {
+                                dictionary.Add(ClientProducts[i].Id, ClientProducts[i].Price);
+                            }
+                            else
+                            {
+                                dictionary[ClientProducts[i].Id] += ClientProducts[i].Price;
+                            }
+                        }
+
+                        string orderString = string.Empty;
+                        double totalPrice = 0;
+
+                        foreach (var diction in dictionary)
+                        {
+                            var clientPoductOne = ClientProducts.Where(prod => prod.Id == diction.Key).Take(1);
+                            var count = ClientProducts.Where(prod => prod.Id == diction.Key).Count();
+                            foreach (var product in clientPoductOne)
+                            {
+                                orderString += $"Продукт: {product.Name}, цена: {product.Price}, ко-во: {count}, итого:{count*product.Price}\n";
+                                totalPrice += count*product.Price;
+                            }
+                        }
+
+                        orderString += $"\n\nОбщая стоимость: {totalPrice}";
+                        MessageBox.Show($"{orderString}");
+                    }
+                    );
+            }
+        }
+        public ICommand Cancel
+        {
+            get
+            {
+                return new ButtonsCommand(
+                    () =>
+                    {
+                        if (ClientProducts.Count != 0)
+                        {
+                            ClientProducts = new List<Product>();
                         }
                     }
-                }); }
+                    );
+            }
         }
-        void RefreshData( string text="")
+        void RefreshData(string text = "")
         {
             myShop = new ShopContext();
             if (rb1)
             {
                 products = (from prod in myShop.Products
-                            where prod.Name.Contains(text) orderby prod.Name
+                            where prod.Name.Contains(text)
+                            orderby prod.Name
                             select prod).ToList();
             }
             else if (rb2)
@@ -178,7 +262,7 @@ namespace WpfApp40
                             orderby prod.Price
                             select prod).ToList();
             }
-          else
+            else
             {
                 products = (from prod in myShop.Products
                             where prod.Name.Contains(text)
